@@ -1,4 +1,5 @@
 import os
+import re
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -64,5 +65,28 @@ def main():
         print(f'An error occurred: {error}')
 
 
+@app.route('/', methods=['POST'])
+def on_event():
+
+    event = request.get_json()
+    message = event['message']['text']
+
+    if message.startswith('/check'):
+        try:
+            match = re.match(r'/check\s+([\w-]+)\s+(.+)', message)
+            spreadsheet_id = match.group(1)
+            sheet_name = match.group(2)
+
+            range_name = f'{sheet_name}!A1:A10'
+
+        except (AttributeError, IndexError, HttpError) as e:
+            
+            return jsonify({'text': f'Invalid command or error: {e}'})
+        
+    else:
+        return jsonify({'text': f'Please use the /check command to validate data.'})
+    
+
+
 if __name__ == '__main__':
-    main()
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
