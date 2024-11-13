@@ -16,9 +16,9 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 
 # declaring SCOPES
-SCOPES = ['https://www.googleapis.com/auth/chat.bot',
-          'https://www.googleapis.com/auth/chat.spaces.readonly',
-          'https://www.googleapis.com/auth/spreadsheets.readonly']
+SCOPES = ['https://www.googleapis.com/auth/chat.spaces.readonly',
+          'https://www.googleapis.com/auth/spreadsheets.readonly',
+          'https://www.googleapis.com/auth/drive.appdata']
 
 
 # ... code for Google API authentication
@@ -42,4 +42,27 @@ def main():
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
-            
+    try:
+        client = google_chat.ChatServiceClient(
+            credentials = creds,
+            client_options = {
+                "scopes" : SCOPES
+            }
+        )
+
+        request = google_chat.ListSpacesRequest(
+            filter = 'space_type = "SPACE"'
+        )
+
+        page_result = client.list_spaces(request)
+
+        for response in page_result:
+            print(response)
+
+    except Exception as error:
+        # TODO
+        print(f'An error occurred: {error}')
+
+
+if __name__ == '__main__':
+    main()
