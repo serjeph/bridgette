@@ -1,6 +1,7 @@
 import os
 import re
 from dotenv import load_dotenv
+from 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -58,7 +59,8 @@ def main():
 
         page_result = client.list_spaces(request)
 
-        print (page_result[0].response)
+        for response in page_result:
+            print (response)
 
     except Exception as error:
         # TODO
@@ -66,6 +68,23 @@ def main():
 
 
 @app.route('/', methods=['POST'])
+def sample_get_message():
+    client = 
+
+    request = google_chat.ListMembershipsRequest(
+        parent = 'spaces/AAAAuTYAHow/members',
+        filter = 'member.type' = "HUMAN",
+        page_size = 100
+    )
+
+    page_result = client.list_memberships(request)
+
+    for response in page_result:
+        print (response)
+
+
+
+
 def on_event():
 
     event = request.get_json()
@@ -84,10 +103,10 @@ def on_event():
             return jsonify({'text': f'Invalid command or error: {e}'})
         
     else:
-        return jsonify({'text': f'Please use the /check command to validate data.'})
+        return jsonify({'message': f'Please use the /check command to validate data.'})
     
 
 
 if __name__ == '__main__':
-    main()
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    sample_get_message()
+    ##app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
